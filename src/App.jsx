@@ -13,7 +13,7 @@ export default function App() {
   const [budget, setBudget] = useState(100); // ✅ Default daily budget
   const [showAlert, setShowAlert] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+ const BASE_URL = import.meta.env.VITE_BASE_URL;  // ✅ Place it here inside the component
   // 🔹 Load history from localStorage on mount
   useEffect(() => {
     const storedHistory = localStorage.getItem("carbonHistory");

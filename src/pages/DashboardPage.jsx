@@ -1,17 +1,40 @@
 // src/pages/DashboardPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import HistoryChart from "../components/HistoryChart";
 import TrackerForm from "../components/TrackerForm";
 
 export default function DashboardPage({ budget }) {
-  // 🔹 Global history state
+  const BASE_URL = import.meta.env.VITE_BASE_URL; // ✅ Added backend URL
   const [history, setHistory] = useState([]);
   const [filter, setFilter] = useState("daily"); // daily | weekly | monthly | all
 
-  // 🔹 Function to add new entry
+  // 🔹 Fetch history from backend on page load
+  useEffect(() => {
+    fetch(`${BASE_URL}/api/footprint`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setHistory(data); // make sure data is array
+      })
+      .catch((err) => console.error("Error fetching footprint data:", err));
+  }, []);
+
+  // 🔹 Function to add new entry (also updates frontend state)
   const addHistoryEntry = (entry) => {
     setHistory((prev) => [...prev, entry]);
+
+    // Optional: POST new entry to backend
+    fetch(`${BASE_URL}/api/footprint`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry)
+    })
+      .then((res) => res.json())
+      .then((data) => console.log("Entry saved to backend:", data))
+      .catch((err) => console.error("Error saving entry:", err));
   };
 
   // Dates for filtering
@@ -109,13 +132,13 @@ export default function DashboardPage({ budget }) {
           Emission Trends
         </h2>
         <div className="w-full h-64">
-          {/* Pass filter so charts & totals stay in sync */}
           <HistoryChart history={history} filter={filter} />
         </div>
       </motion.div>
     </div>
   );
 }
+
 
 
 

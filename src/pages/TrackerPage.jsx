@@ -1,9 +1,23 @@
 // src/pages/TrackerPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export default function TrackerPage({ history, setHistory }) {
+  const BASE_URL = import.meta.env.VITE_BASE_URL; // ✅ Added backend URL
   const [filterCategory, setFilterCategory] = useState("all");
+
+  // 🔹 Fetch existing history from backend on page load
+  useEffect(() => {
+    fetch(`${BASE_URL}/api/footprint`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setHistory(data);
+      })
+      .catch((err) => console.error("Error fetching footprint data:", err));
+  }, [BASE_URL, setHistory]);
 
   // ✅ Filtered history
   const filteredHistory =
@@ -13,19 +27,31 @@ export default function TrackerPage({ history, setHistory }) {
 
   // ✅ Delete entry
   const handleDelete = (index) => {
-    setHistory((prev) => prev.filter((_, i) => i !== index));
+    const entry = history[index];
+    fetch(`${BASE_URL}/api/footprint/${entry._id}`, {
+      method: "DELETE"
+    })
+      .then(() => setHistory((prev) => prev.filter((_, i) => i !== index)))
+      .catch((err) => console.error("Error deleting entry:", err));
   };
 
-  // ✅ Edit entry (simple prompt for now)
+  // ✅ Edit entry
   const handleEdit = (index) => {
-    const newValue = prompt(
-      "Enter new CO₂ value (kg):",
-      history[index].value
-    );
+    const newValue = prompt("Enter new CO₂ value (kg):", history[index].value);
     if (newValue) {
-      const updated = [...history];
-      updated[index].value = parseFloat(newValue);
-      setHistory(updated);
+      const updatedEntry = { ...history[index], value: parseFloat(newValue) };
+      fetch(`${BASE_URL}/api/footprint/${updatedEntry._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedEntry)
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const updated = [...history];
+          updated[index] = data; // update with backend response
+          setHistory(updated);
+        })
+        .catch((err) => console.error("Error updating entry:", err));
     }
   };
 
@@ -100,6 +126,7 @@ export default function TrackerPage({ history, setHistory }) {
     </div>
   );
 }
+
 
 
 
