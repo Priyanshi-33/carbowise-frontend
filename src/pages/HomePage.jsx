@@ -25,7 +25,7 @@ export default function HomePage() {
         {/* ✅ Button moved below with spacing */}
         <div className="mt-6">
           <Link
-            to="/tracker"
+            to="/dashboard"
             className="px-6 py-3 bg-green-700 hover:bg-green-800 text-white font-bold rounded-lg shadow-md transition"
           >
         
