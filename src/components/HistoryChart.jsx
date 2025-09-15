@@ -18,43 +18,42 @@ import {
 const COLORS = ["#4ade80", "#60a5fa", "#facc15", "#f87171"];
 
 export default function HistoryChart({ history, filter }) {
-  // ✅ Date references
-  const today = new Date().toLocaleDateString();
+  // Parse and filter dates
+  const today = new Date();
   const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 6);
+  weekAgo.setDate(today.getDate() - 6);
   const monthAgo = new Date();
-  monthAgo.setDate(monthAgo.getDate() - 29);
+  monthAgo.setDate(today.getDate() - 29);
 
-  // ✅ Filtered history
   const filteredHistory = history.filter((h) => {
-    const entryDate = new Date(h.date);
-    if (filter === "daily") return h.date === today;
-    if (filter === "weekly") return entryDate >= weekAgo;
-    if (filter === "monthly") return entryDate >= monthAgo;
-    return true; // all
+   const entryDate = new Date(h.date);
+  if (filter === "daily") return entryDate.toDateString() === today.toDateString();
+  if (filter === "weekly") return entryDate >= weekAgo;
+  if (filter === "monthly") return entryDate >= monthAgo;
+  return true;
   });
+const sortedHistory = [...filteredHistory].sort(
+  (a, b) => new Date(a.date) - new Date(b.date)
+);
+  // Aggregate values by date for line chart
+ const lineMap = {};
+filteredHistory.forEach((h) => {
+  const dateKey = new Date(h.date).toLocaleDateString();
+  lineMap[dateKey] = (lineMap[dateKey] || 0) + h.value;
+});
+const lineData = Object.entries(lineMap)
+  .map(([date, value]) => ({ date, value }))
+  .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // ✅ Sort by date (important for line chart)
-  const sortedHistory = [...filteredHistory].sort(
-    (a, b) => new Date(a.date) - new Date(b.date)
-  );
-
-  // ✅ Line Chart Data
-  const lineData = sortedHistory.map((h, index) => ({
-    id: index,
-    date: h.date,
-    value: h.value,
-  }));
-
-  // ✅ Pie Chart Data (sum by category)
-  const categoryTotals = filteredHistory.reduce((acc, h) => {
-    acc[h.category] = (acc[h.category] || 0) + h.value;
-    return acc;
-  }, {});
-  const pieData = Object.entries(categoryTotals).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  // Pie chart: sum by category
+ const categoryTotals = filteredHistory.reduce((acc, h) => {
+  acc[h.category] = (acc[h.category] || 0) + h.value;
+  return acc;
+}, {});
+const pieData = Object.entries(categoryTotals).map(([name, value]) => ({
+  name,
+  value,
+}));
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -75,7 +74,7 @@ export default function HistoryChart({ history, filter }) {
               <Line
                 type="monotone"
                 dataKey="value"
-                stroke="#22c55e" // green
+                stroke="#22c55e"
                 strokeWidth={2}
                 dot={{ r: 3, fill: "#22c55e" }}
                 activeDot={{ r: 6 }}
@@ -116,6 +115,7 @@ export default function HistoryChart({ history, filter }) {
     </div>
   );
 }
+
 
 
 
