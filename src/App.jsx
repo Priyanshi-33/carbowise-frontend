@@ -1,33 +1,45 @@
 // src/App.jsx
 import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
-import TrackerPage from "./pages/TrackerPage";
-import DashboardPage from "./pages/DashboardPage";
-import SettingsPage from "./pages/SettingsPage";
-import Navbar from "./components/Navbar";
+
+// Pages
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
-import ReduceFootprint from './pages/ReduceFootprint';
+import DashboardPage from "./pages/DashboardPage";
+import TrackerPage from "./pages/TrackerPage";
+import SettingsPage from "./pages/SettingsPage";
+import ReduceFootprint from "./pages/ReduceFootprint";
+
+// Components
+import Navbar from "./components/Navbar";
+import Login from "./components/Login";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+
+// Context
+import { UserProvider } from "./context/UserContext.jsx";
+
 export default function App() {
   const [history, setHistory] = useState([]);
-  const [budget, setBudget] = useState(100); // ✅ Default daily budget
+  const [budget, setBudget] = useState(100);
   const [showAlert, setShowAlert] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
- const BASE_URL = import.meta.env.VITE_BASE_URL;  // ✅ Place it here inside the component
-  // 🔹 Load history from localStorage on mount
+
+  // Load history from localStorage
   useEffect(() => {
     const storedHistory = localStorage.getItem("carbonHistory");
     if (storedHistory) setHistory(JSON.parse(storedHistory));
   }, []);
 
-  // 🔹 Save history changes to localStorage
+  // Save history to localStorage
   useEffect(() => {
     if (history.length > 0) {
       localStorage.setItem("carbonHistory", JSON.stringify(history));
     }
   }, [history]);
 
-  // 🔹 Add new record with alert check
+  // Add new record and check budget
   const handleAddRecord = (record) => {
     const updatedHistory = [record, ...history];
     setHistory(updatedHistory);
@@ -47,74 +59,96 @@ export default function App() {
   };
 
   return (
-    <div
-      className="min-h-screen bg-black/40 backdrop-blur-sm"
-      style={{
-        backgroundImage: "url('/images/back-leaves.jpg')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }}
-    >
-      {/* 🔹 Navbar */}
-      <Navbar />
+    <UserProvider>
+      <div
+        className="min-h-screen bg-black/40 backdrop-blur-sm"
+        style={{
+          backgroundImage: "url('/images/back-leaves.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        {/* Navbar */}
+        <Navbar />
 
-      {/* 🔹 Toast Alerts */}
-      {showAlert && (
-        <div className="fixed top-20 right-6 bg-red-600 text-white px-4 py-2 rounded shadow-lg animate-bounce z-50">
-          ⚠️ Daily CO₂ budget exceeded!
-        </div>
-      )}
-      {showSuccess && (
-        <div className="fixed top-36 right-6 bg-green-600 text-white px-4 py-2 rounded shadow-lg animate-bounce z-50">
-          ✅ You are within today’s CO₂ budget!
-        </div>
-      )}
+        {/* Toast Alerts */}
+        {showAlert && (
+          <div className="fixed top-20 right-6 bg-red-600 text-white px-4 py-2 rounded shadow-lg animate-bounce z-50">
+            ⚠️ Daily CO₂ budget exceeded!
+          </div>
+        )}
+        {showSuccess && (
+          <div className="fixed top-36 right-6 bg-green-600 text-white px-4 py-2 rounded shadow-lg animate-bounce z-50">
+            ✅ You are within today’s CO₂ budget!
+          </div>
+        )}
 
-      {/* 🔹 Routes */}
-      <main className="p-6 m-6 pt-24 backdrop-blur-sm bg-white/30 rounded-2xl shadow-lg">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/reduce-footprint" element={<ReduceFootprint />} />
-          {/* TrackerPage → add entries */}
+        {/* Routes */}
+        <main className="p-6 m-6 pt-24 backdrop-blur-sm bg-white/30 rounded-2xl shadow-lg">
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+            {/* Protected Routes */}
+            <Route
+    path="/dashboard"
+    element={
+      <ProtectedRoute>
+        <DashboardPage history={history} budget={budget} />
+      </ProtectedRoute>
+    }
+               />
+               <Route
+    path="/tracker"
+    element={
+      <ProtectedRoute>
+        <TrackerPage history={history} onAddRecord={handleAddRecord} />
+      </ProtectedRoute>
+    }
+  />
           <Route
-            path="/tracker"
-            element={
-              <TrackerPage history={history} onAddRecord={handleAddRecord} />
-            }
-          />
-
-          {/* DashboardPage → stats + charts */}
-          <Route
-            path="/dashboard"
-            element={<DashboardPage history={history} budget={budget} />}
-          />
-
-          {/* SettingsPage → budget + reset */}
-          <Route
-            path="/settings"
-            element={
-              <SettingsPage
-                budget={budget}
-                setBudget={setBudget}
-                setHistory={setHistory}
-              />
-            }
-          />
-
-          {/* Fallback route */}
-          <Route
-            path="*"
-            element={
-              <TrackerPage history={history} onAddRecord={handleAddRecord} />
-            }
-          />
-        </Routes>
-      </main>
-    </div>
+    path="/settings"
+    element={
+      <ProtectedRoute>
+        <SettingsPage
+          budget={budget}
+          setBudget={setBudget}
+          setHistory={setHistory}
+        />
+      </ProtectedRoute>
+    }
+  />
+  <Route
+    path="/reduce-footprint"
+    element={
+      <ProtectedRoute>
+        <ReduceFootprint />
+      </ProtectedRoute>
+    }
+  />
+            {/* Fallback → redirect to tracker for logged-in users */}
+            <Route
+              path="*"
+              element={
+                <ProtectedRoute>
+                  <TrackerPage history={history} onAddRecord={handleAddRecord} />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
+      </div>
+    </UserProvider>
   );
 }
+
+
+
 
 
 
