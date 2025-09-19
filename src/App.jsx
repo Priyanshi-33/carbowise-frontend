@@ -18,7 +18,7 @@ import ResetPassword from "./components/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 // Context
-import { UserProvider } from "./context/UserContext.jsx";
+import { UserProvider } from "./Context/UserContext.jsx";
 
 export default function App() {
   const [history, setHistory] = useState([]);
