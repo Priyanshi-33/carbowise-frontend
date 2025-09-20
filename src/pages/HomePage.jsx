@@ -3,7 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Leaf, BarChart3, Target, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import HomePage from "./pages/HomePage";
 export default function HomePage() {
   return (
     <div className="max-w-6xl mx-auto text-center text-gray-900 space-y-16">

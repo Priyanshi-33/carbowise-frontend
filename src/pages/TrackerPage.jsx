@@ -1,7 +1,7 @@
 // src/pages/TrackerPage.jsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-
+import TrackerPage from "./pages/TrackerPage";
 export default function TrackerPage({ history, setHistory }) {
   const BASE_URL = import.meta.env.VITE_BASE_URL; // ✅ Added backend URL
   const [filterCategory, setFilterCategory] = useState("all");
