@@ -1,7 +1,7 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api.js";
-import { UserContext } from "../context/UserContext.jsx";
+import { UserContext } from "../Context/UserContext.jsx";
 
 const Login = () => {
   const { setUser } = useContext(UserContext);

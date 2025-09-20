@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 import { Link, useNavigate } from "react-router-dom";
 import { useContext } from "react";
-import { UserContext } from "../context/UserContext.jsx";
+import { UserContext } from "../Context/UserContext.jsx";
 import api from "../services/api.js"; // centralized Axios
 import { motion, AnimatePresence } from "framer-motion";
 
