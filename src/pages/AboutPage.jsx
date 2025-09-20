@@ -1,7 +1,6 @@
 // src/pages/AboutPage.jsx
 import React from "react";
 import { motion } from "framer-motion";
-import AboutPage from "./pages/AboutPage";
 export default function AboutPage() {
   return (
     <div className="max-w-4xl mx-auto text-center text-gray-900 space-y-10">
