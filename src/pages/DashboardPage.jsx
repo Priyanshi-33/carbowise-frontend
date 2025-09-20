@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import HistoryChart from "../components/HistoryChart";
 import TrackerForm from "../components/TrackerForm";
-import DashboardPage from "./pages/DashboardPage";
+
 export default function DashboardPage({ budget }) {
   const BASE_URL = import.meta.env.VITE_BASE_URL;
   const [history, setHistory] = useState([]);

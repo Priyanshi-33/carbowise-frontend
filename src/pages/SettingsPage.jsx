@@ -1,7 +1,7 @@
 // src/pages/SettingsPage.jsx
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import SettingsPage from "./pages/SettingsPage";
+
 export default function SettingsPage({ budget, setBudget, setHistory }) {
   const [tempBudget, setTempBudget] = useState(budget);
 
